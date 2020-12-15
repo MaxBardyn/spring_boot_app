@@ -5,10 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
-import ul.lviv.iot.springjpa.entity.Ticket;
+import ul.lviv.iot.springjpa.dto.TicketDto;
+import ul.lviv.iot.springjpa.mapper.TicketMapper;
 import ul.lviv.iot.springjpa.service.TicketService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("tickets")
@@ -17,29 +19,31 @@ public class TicketController {
 
 
     private final TicketService ticketService;
+    private final TicketMapper ticketMapper;
 
     @GetMapping("/")
-    public ResponseEntity<List<Ticket>> findAllTicketOffices() {
-        var allOffices = ticketService.findAllTickets();
-        return (CollectionUtils.isEmpty(allOffices)
+    public ResponseEntity<List<TicketDto>> findAllTicketOffices() {
+        var allTickets = ticketService.findAllTickets().stream()
+                .map(ticketMapper::toDto).collect(Collectors.toList());
+        return (CollectionUtils.isEmpty(allTickets)
                 ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
-                : new ResponseEntity<>(allOffices, HttpStatus.OK));
+                : new ResponseEntity<>(allTickets, HttpStatus.OK));
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<Ticket> findTicketOfficeById(@PathVariable("id") Long id) {
-        var office = ticketService.findTicketById(id);
+    public ResponseEntity<TicketDto> findTicketOfficeById(@PathVariable("id") Long id) {
+        var ticket = ticketService.findTicketById(id);
         return (id == null
                 ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
-                : new ResponseEntity<>(office, HttpStatus.OK));
+                : new ResponseEntity<>(ticketMapper.toDto(ticket), HttpStatus.OK));
     }
 
     @PostMapping("/")
-    public ResponseEntity<Ticket> createTicketOffice(@RequestBody Ticket ticket) {
-        var newOffice = ticketService.createTicket(ticket);
-        return newOffice == null
+    public ResponseEntity<TicketDto> createTicketOffice(@RequestBody TicketDto ticket) {
+        var newTicket = ticketService.createTicket(ticketMapper.toEntity(ticket));
+        return newTicket == null
                 ? new ResponseEntity<>(HttpStatus.BAD_REQUEST)
-                : new ResponseEntity<>(newOffice, HttpStatus.CREATED);
+                : new ResponseEntity<>(ticketMapper.toDto(newTicket), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
@@ -51,12 +55,12 @@ public class TicketController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Ticket> updateEvent(final @PathVariable("id") Long id,
-                                              final @RequestBody Ticket ticketOffice) {
-        var updatedOffice = ticketService.updateTicket(id, ticketOffice);
+    public ResponseEntity<TicketDto> updateEvent(final @PathVariable("id") Long id,
+                                                 final @RequestBody TicketDto ticketDto) {
+        var updatedTicket = ticketService.updateTicket(id, ticketMapper.toEntity(ticketDto));
         return (id == null
                 ? new ResponseEntity<>(HttpStatus.BAD_REQUEST)
-                : new ResponseEntity<>(updatedOffice, HttpStatus.OK));
+                : new ResponseEntity<>(ticketMapper.toDto(updatedTicket), HttpStatus.OK));
 
     }
 }

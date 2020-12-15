@@ -2,7 +2,6 @@ package ul.lviv.iot.springjpa.entity;
 
 
 import lombok.Data;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -32,6 +31,5 @@ public class Artist {
     private String alias;
 
     @ManyToOne
-    @ToString.Exclude
     private Event event;
 }

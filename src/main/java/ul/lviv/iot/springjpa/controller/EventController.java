@@ -5,10 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
-import ul.lviv.iot.springjpa.entity.Event;
+import ul.lviv.iot.springjpa.dto.EventDto;
+import ul.lviv.iot.springjpa.mapper.EventMapper;
 import ul.lviv.iot.springjpa.service.EventService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("events")
@@ -17,29 +19,31 @@ public class EventController {
 
 
     private final EventService eventService;
+    private final EventMapper eventMapper;
 
     @GetMapping("/")
-    public ResponseEntity<List<Event>> findAllEvents() {
-        var allEvents = eventService.findAllEvents();
+    public ResponseEntity<List<EventDto>> findAllEvents() {
+        var allEvents = eventService.findAllEvents().stream()
+                .map(eventMapper::toDto).collect(Collectors.toList());
         return (CollectionUtils.isEmpty(allEvents)
                 ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
                 : new ResponseEntity<>(allEvents, HttpStatus.OK));
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<Event> findEventById(@PathVariable("id") Long id) {
+    public ResponseEntity<EventDto> findEventById(@PathVariable("id") Long id) {
         var event = eventService.findEventById(id);
         return (id == null
                 ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
-                : new ResponseEntity<>(event, HttpStatus.OK));
+                : new ResponseEntity<>(eventMapper.toDto(event), HttpStatus.OK));
     }
 
     @PostMapping("/")
-    public ResponseEntity<Event> createEvent(@RequestBody Event event) {
-        var newEvent = eventService.createEvent(event);
+    public ResponseEntity<EventDto> createEvent(@RequestBody EventDto event) {
+        var newEvent = eventService.createEvent(eventMapper.toEntity(event));
         return newEvent == null
                 ? new ResponseEntity<>(HttpStatus.BAD_REQUEST)
-                : new ResponseEntity<>(newEvent, HttpStatus.CREATED);
+                : new ResponseEntity<>(eventMapper.toDto(newEvent), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
@@ -51,12 +55,12 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Event> updateEvent(final @PathVariable("id") Long id,
-                                             final @RequestBody Event event) {
-        var updatedEvent = eventService.updateEvent(id, event);
+    public ResponseEntity<EventDto> updateEvent(final @PathVariable("id") Long id,
+                                                final @RequestBody EventDto event) {
+        var updatedEvent = eventService.updateEvent(id, eventMapper.toEntity(event));
         return (id == null
                 ? new ResponseEntity<>(HttpStatus.BAD_REQUEST)
-                : new ResponseEntity<>(updatedEvent, HttpStatus.OK));
+                : new ResponseEntity<>(eventMapper.toDto(updatedEvent), HttpStatus.OK));
 
     }
 }

@@ -1,7 +1,6 @@
 package ul.lviv.iot.springjpa.entity;
 
 import lombok.Data;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -28,14 +27,12 @@ public class Ticket {
     private String placeNumber;
 
     @OneToOne
-    @JoinColumn(name = "event_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "event_id", referencedColumnName = "id")
     private Event event;
 
     @ManyToOne
-    @ToString.Exclude
     private TicketOffice ticketOffice;
 
     @ManyToOne
-    @ToString.Exclude
     private User user;
 }

@@ -1,11 +1,10 @@
 package ul.lviv.iot.springjpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Entity
@@ -19,7 +18,6 @@ public class TicketOffice {
     @Column(name = "id")
     private Long id;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "ticketOffice", orphanRemoval = true)
-    @JsonIgnore
-    private Set<Ticket> tickets;
+    @OneToMany(mappedBy = "ticketOffice")
+    private List<Ticket> tickets;
 }

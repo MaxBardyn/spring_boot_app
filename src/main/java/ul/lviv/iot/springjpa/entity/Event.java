@@ -6,14 +6,13 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Entity
 @Accessors(chain = true)
 @Table(name = "event")
-public class Event implements Serializable {
+public class Event {
 
 
     @Id
@@ -28,10 +27,8 @@ public class Event implements Serializable {
     private Ticket Ticket;
 
     @ManyToOne
-    @ToString.Exclude
     private Location location;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "event", orphanRemoval = true)
-    @JsonIgnore
-    private Set<Artist> artists;
+    @OneToMany(mappedBy = "event")
+    private List<Artist> artists;
 }

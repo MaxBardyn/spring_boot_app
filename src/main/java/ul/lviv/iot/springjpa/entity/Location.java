@@ -1,11 +1,10 @@
 package ul.lviv.iot.springjpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Entity
@@ -25,7 +24,6 @@ public class Location {
     @Column(name = "address")
     private String address;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "location", orphanRemoval = true)
-    @JsonIgnore
-    private Set<Event> events;
+    @OneToMany(mappedBy = "location")
+    private List<Event> events;
 }

@@ -1,12 +1,11 @@
 package ul.lviv.iot.springjpa.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Entity
@@ -29,7 +28,6 @@ public class User {
     @Column(name = "age")
     private Integer age;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
-    @JsonIgnore
-    private Set<Ticket> tickets;
+    @OneToMany(mappedBy = "user")
+    private List<Ticket> tickets;
 }
